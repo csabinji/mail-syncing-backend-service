@@ -2,6 +2,7 @@ const responseHelper = require("../helper/responseHelper");
 const tokenGenerator = require("../helper/tokenGenerator");
 const { User } = require("../models");
 const { SERVER_ERROR } = require("../utils/constVariables");
+const bcrypt = require('bcryptjs');
 
 module.exports = {
     register: async (req, res, next) => {
@@ -18,14 +19,36 @@ module.exports = {
             if (userData['password'] != userData['confirm_password']) {
                 return responseHelper(false, 'Password and confirm password does not match.', 409, '', {}, res);
             }
+            // Password hashing
+            const hash = await bcrypt.hash(userData['password'], 10);
 
-            const user = await User.create(userData);
+            const user = await User.create({ ...userData, password: hash });
 
             // Generate Token
             const tokens = await tokenGenerator(user);
-            return responseHelper(true, 'User account created.', 200, '', tokens, res);
+            return responseHelper(true, 'User account created.', 200, 'Authentication', tokens, res);
         } catch (error) {
-            return responseHelper(false, SERVER_ERROR, 500, ``, {}, res);
+            return responseHelper(false, SERVER_ERROR, 500, '', {}, res);
         }
+    },
+    login: async (req, res, next) => {
+        try {
+            const { email, password } = req.body;
+
+            // Check user existance
+            const user = await User.findOne({ email }).exec();
+            if (!user) return responseHelper(false, 'User does not exist.', 403, '', {}, res);
+
+            // Check password
+            const matchPassword = await bcrypt.compare(password, user['password']);
+            if (!matchPassword) return responseHelper(false, 'Incorrect email or password', 403, '', {}, res);
+
+            // Generate Token
+            const tokens = await tokenGenerator(user);
+            return responseHelper(true, 'Login success', 200, 'Authentication', tokens, res);
+        } catch (error) {
+            return responseHelper(false, SERVER_ERROR, 500, '', {}, res);
+        }
+
     }
 }
