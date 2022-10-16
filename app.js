@@ -4,6 +4,8 @@ const app = express();
 const { router, cors } = require('./config');
 const { PORT } = require('./config/env');
 
+require(`./config/dbConnection`);
+
 app.use(express.urlencoded({ limit: "50mb", extended: false }));
 app.use(express.json());
 
