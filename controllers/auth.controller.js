@@ -1,10 +1,11 @@
 const responseHelper = require("../helper/responseHelper");
 const tokenGenerator = require("../helper/tokenGenerator");
-const { User } = require("../models");
+const { User, AccessToken } = require("../models");
 const { SERVER_ERROR } = require("../utils/constVariables");
 const bcrypt = require('bcryptjs');
 
 module.exports = {
+    // Register controller
     register: async (req, res, next) => {
         try {
             const userData = req.body;
@@ -31,6 +32,7 @@ module.exports = {
             return responseHelper(false, SERVER_ERROR, 500, '', {}, res);
         }
     },
+    // Login controller
     login: async (req, res, next) => {
         try {
             const { email, password } = req.body;
@@ -49,6 +51,18 @@ module.exports = {
         } catch (error) {
             return responseHelper(false, SERVER_ERROR, 500, '', {}, res);
         }
-
-    }
-}
+    },
+    // logout controller
+    logout: async (req, res, next) => {
+        try {
+            await req.user.remove();
+            await AccessToken.deleteOne({
+                token: req.user['token'],
+            });
+            return responseHelper(true, 'Logout success', 200, 'Authentication', {}, res);
+        } catch (error) {
+            console.log(error);
+            return responseHelper(false, SERVER_ERROR, 500, '', {}, res);
+        }
+    },
+};

@@ -9,16 +9,9 @@ const accessTokenSchema = new mongoose.Schema(
             ref: 'User',
             required: true,
         },
-        client_id: {
-            type: String,
-        },
         token: {
             type: String,
             required: true,
-        },
-        revoked: {
-            type: Boolean,
-            default: false,
         },
         expires_at: {
             type: Date,
