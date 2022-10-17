@@ -1,16 +1,19 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
-const { router, cors } = require('./config');
+const { router, cors, passport } = require('./config');
 const { PORT } = require('./config/env');
 
 require(`./config/dbConnection`);
+
+// passport js
+app.use(passport.initialize());
 
 app.use(express.urlencoded({ limit: "50mb", extended: false }));
 app.use(express.json());
 
 // cors imlementation
-// app.use(cors);
+app.use(cors);
 
 // Routes setup
 const apiRoutes = router();
