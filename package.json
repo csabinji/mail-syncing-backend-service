@@ -18,6 +18,7 @@
     "googleapis": "^108.0.0",
     "moment": "^2.29.4",
     "mongoose": "^6.6.5",
+    "nodemailer": "^6.8.0",
     "nodemon": "^2.0.20",
     "passport": "^0.6.0",
     "passport-http-bearer": "^1.0.1"

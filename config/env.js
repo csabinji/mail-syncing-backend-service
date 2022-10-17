@@ -11,4 +11,5 @@ module.exports = {
     MONGO_DB_URL: env['MONGO_DB_URL'],
     PORT: env['PORT'],
     REDIRECT_URL: env['REDIRECT_URL'],
+    REFRESH_TOKEN: env['REFRESH_TOKEN'],
 }

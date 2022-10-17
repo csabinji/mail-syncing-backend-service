@@ -1,16 +1,9 @@
-const { CLIENT_ID, CLIENT_SECRET, CODE, REDIRECT_URL, GRANT_TYPE, GET_ACCESS_TOKEN_URL } = require("../config/env");
 const responseHelper = require("../helper/responseHelper");
 const { SERVER_ERROR } = require("../utils/constVariables");
 const axios = require('axios');
-const { google } = require("googleapis");
-
-const oAuth2Client = new google.auth.OAuth2(
-    process.env.CLIENT_ID,
-    process.env.CLIENT_SECRET,
-    process.env.REDIRECT_URL
-);
-
-oAuth2Client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN });
+const oAuth2Client = require("../config/oAuth2Client");
+const { auth } = require("../config/nodemailer");
+const nodemailer = require(`nodemailer`);
 
 module.exports = {
     getEmail: async (req, res, next) => {
@@ -23,7 +16,31 @@ module.exports = {
             return responseHelper(true, 'Email fetched', 200, '', messageArray, res);
         } catch (error) {
             return responseHelper(false, SERVER_ERROR, 500, '', {}, res);
+        }
+    },
+    sendEmail: async (req, res, next) => {
+        try {
+            const { email, subject, text } = req.body;
+            const { token } = await oAuth2Client.getAccessToken();
+            const transport = nodemailer.createTransport({
+                service: "gmail",
+                auth: {
+                    ...auth,
+                    accessToken: token,
+                },
+            });
 
+            const mailOptions = {
+                from: req.user['email'], // sender
+                to: email, // receiver
+                subject: subject, // Subject
+                text: text,
+            };
+
+            const result = await transport.sendMail(mailOptions);
+            return responseHelper(true, 'Email sent', 200, '', result, res);
+        } catch (error) {
+            return responseHelper(false, SERVER_ERROR, 500, '', {}, res);
         }
     }
 }
@@ -35,17 +52,6 @@ const getAccesToken = async (email) => {
     const response = await axios(config);
     return response.data;
 }
-
-const generateConfig = (url, accessToken) => {
-    return {
-        method: "get",
-        url: url,
-        headers: {
-            Authorization: `Bearer ${accessToken} `,
-            "Content-type": "application/json",
-        },
-    };
-};
 
 const readMail = async (email, messages) => {
     const messageArray = await Promise.all(messages?.messages.map(async (message) => {
@@ -59,3 +65,14 @@ const readMail = async (email, messages) => {
     }));
     return messageArray;
 }
+
+const generateConfig = (url, accessToken) => {
+    return {
+        method: "get",
+        url: url,
+        headers: {
+            Authorization: `Bearer ${accessToken} `,
+            "Content-type": "application/json",
+        },
+    };
+};
