@@ -1,7 +1,7 @@
 const responseHelper = require("../helper/responseHelper");
 const tokenGenerator = require("../helper/tokenGenerator");
 const { User, AccessToken } = require("../models");
-const { SERVER_ERROR } = require("../utils/constVariables");
+const { SERVER_ERROR, PASSWORD_NOT_MATCHED } = require("../utils/constVariables");
 const bcrypt = require('bcryptjs');
 
 module.exports = {
@@ -18,7 +18,7 @@ module.exports = {
 
             // Check password and confirm password
             if (userData['password'] != userData['confirm_password']) {
-                return responseHelper(false, 'Password and confirm password does not match.', 409, '', {}, res);
+                return responseHelper(false, PASSWORD_NOT_MATCHED, 409, '', {}, res);
             }
             // Password hashing
             const hash = await bcrypt.hash(userData['password'], 10);

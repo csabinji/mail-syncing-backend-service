@@ -8,6 +8,8 @@ module.exports = {
     CLIENT_SECRET: env['CLIENT_SECRET'],
     GET_ACCESS_TOKEN_URL: env['GET_ACCESS_TOKEN_URL'],
     GRANT_TYPE: env['GRANT_TYPE'],
+    MAIL_SERVICE: env['MAIL_SERVICE'],
+    MAIL_ACCOUNT: env['MAIL_ACCOUNT'],
     MONGO_DB_URL: env['MONGO_DB_URL'],
     PORT: env['PORT'],
     REDIRECT_URL: env['REDIRECT_URL'],

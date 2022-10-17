@@ -5,7 +5,6 @@ const { AccessToken } = require('../models');
 
 module.exports = async (user) => {
     const { accessToken } = await getUniqueToken();
-    console.log(accessToken)
     const currentDate = moment();
     const accessTokenLifeTime = moment(currentDate).add(
         ACCESS_TOKEN_LIFETIME,
